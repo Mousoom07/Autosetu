@@ -7,6 +7,11 @@ AutoSetu is a booking and workshop-management platform for a multi-brand car ser
 🔗 **Live demo:** [autosetu.vercel.app](https://autosetu.vercel.app/)
 
 ---
+<img width="1896" height="922" alt="image" src="https://github.com/user-attachments/assets/328d190f-6fa0-430b-8f9c-8fcb36da6e05" />
+<img width="1896" height="916" alt="image" src="https://github.com/user-attachments/assets/f5806627-105f-4f66-a74a-2b116988e1b2" />
+![Uploading image.png…]()
+
+
 
 ## ✨ Features
 
