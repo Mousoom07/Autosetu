@@ -100,13 +100,13 @@ autosetu/
 
 ## 🏪 About
 
-AutoSetu is modeled on an independent multi-brand service centre on Residency Road, Bengaluru, running since 2013 — insurance-approved, ISO 9001-aligned workshop process, and certified multi-brand technicians using genuine parts (Bosch, MRF, Mobil).
+AutoSetu is modeled on an independent multi-brand service centre on Residency Road, Bengaluru, running since 2026 — insurance-approved, ISO 9001-aligned workshop process, and certified multi-brand technicians using genuine parts (Bosch, MRF, Mobil).
 
 ---
 
 ## 📄 License
 
-Add your license here (e.g. MIT).
+Mousoom Samanta.
 
 ---
 
