@@ -9,8 +9,7 @@ AutoSetu is a booking and workshop-management platform for a multi-brand car ser
 ---
 <img width="1896" height="922" alt="image" src="https://github.com/user-attachments/assets/328d190f-6fa0-430b-8f9c-8fcb36da6e05" />
 <img width="1896" height="916" alt="image" src="https://github.com/user-attachments/assets/f5806627-105f-4f66-a74a-2b116988e1b2" />
-![Uploading image.png…]()
-
+<img width="1886" height="915" alt="image" src="https://github.com/user-attachments/assets/524c2eac-8dc0-4098-9243-123f6c7a6147" />
 
 
 ## ✨ Features
