@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoSetu — Gaadi Ki Seva, Poori Shraddha Se</title>
+<meta name="description" content="Bengaluru's own multi-brand car service workshop. Transparent pricing, certified technicians, and a live status board — no phone tag." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700;800&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* --- Extra home-page-only sections: pricing chart, care tips, certifications, FAQ ---
+     Reuses the site's existing CSS custom properties so it blends with styles.css. */
+  .price-panel{ display:grid; gap:22px; }
+  .price-panel .bar-row-top{ display:flex; justify-content:space-between; gap:10px; font-weight:600; }
+  .price-panel .bar-row-top .price-tag{ font-weight:800; color:var(--teal-deep,#0a3639); white-space:nowrap; }
+  .price-note{ margin-top:6px; font-size:0.84rem; color:var(--ink-soft,#6b6155); }
+
+  .tip-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:28px; }
+  .tip-card{ background:var(--surface,#fff); border:1px solid var(--line,rgba(10,54,57,0.12)); border-radius:14px; padding:20px 18px; display:flex; flex-direction:column; gap:10px; }
+  .tip-card .tip-num{ width:34px; height:34px; border-radius:50%; background:var(--teal-deep,#0a3639); color:#f4d774; display:flex; align-items:center; justify-content:center; font-weight:800; font-family:var(--ff-hand,inherit); }
+  .tip-card h3{ margin:0; font-size:1.02rem; }
+  .tip-card p{ margin:0; font-size:0.9rem; color:var(--ink-soft,#6b6155); }
+
+  .cert-strip{ display:flex; flex-wrap:wrap; gap:14px; margin-top:28px; justify-content:center; }
+  .cert-chip{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:999px; border:1px solid var(--line,rgba(10,54,57,0.15)); background:var(--surface,#fff); font-size:0.88rem; font-weight:600; color:var(--teal-deep,#0a3639); }
+  .cert-chip svg{ width:16px; height:16px; flex:none; }
+
+  .faq-list{ max-width:760px; margin:28px auto 0; display:grid; gap:12px; }
+  .faq-item{ border:1px solid var(--line,rgba(10,54,57,0.15)); border-radius:12px; background:var(--surface,#fff); overflow:hidden; }
+  .faq-item summary{ cursor:pointer; list-style:none; padding:16px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:12px; color:var(--teal-deep,#0a3639); }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary::after{ content:"+"; font-size:1.3rem; font-weight:400; color:var(--gold,#d7a13a); transition:transform .2s ease; }
+  .faq-item[open] summary::after{ transform:rotate(45deg); }
+  .faq-item p{ margin:0; padding:0 20px 18px; color:var(--ink-soft,#6b6155); font-size:0.92rem; line-height:1.55; }
+
+  .locality-strip{ margin-top:20px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; font-size:0.86rem; color:var(--ink-soft,#6b6155); }
+  .locality-strip span{ padding:6px 12px; border-radius:999px; background:var(--surface-alt,rgba(10,54,57,0.06)); }
+
+  /* --- Staff dashboard (added to satisfy the CarePoint/VESA brief: overview counts,
+       list/calendar of today's appointments, and staff-side search & filter). --- */
+  .dash-hidden{ display:none; }
+  .dash-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:24px 0 32px; }
+  .dash-stat{ background:var(--surface,#fff); border:1px solid var(--line,rgba(10,54,57,0.12)); border-radius:14px; padding:18px; text-align:center; }
+  .dash-stat .dash-stat-num{ font-family:var(--ff-hand,inherit); font-size:1.9rem; font-weight:800; color:var(--teal-deep,#0a3639); line-height:1; }
+  .dash-stat .dash-stat-label{ margin-top:6px; font-size:0.82rem; color:var(--ink-soft,#6b6155); }
+  .dash-toolbar{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin-bottom:18px; }
+  .dash-toolbar .field{ flex:1; min-width:160px; }
+  .dash-view-toggle{ display:flex; gap:8px; }
+  .dash-view-toggle button{ padding:8px 14px; border-radius:999px; border:1px solid var(--line,rgba(10,54,57,0.2)); background:var(--surface,#fff); font-size:0.85rem; font-weight:600; cursor:pointer; }
+  .dash-view-toggle button.is-active{ background:var(--teal-deep,#0a3639); color:#fff; border-color:var(--teal-deep,#0a3639); }
+  .dash-calendar{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .dash-day-col{ border:1px solid var(--line,rgba(10,54,57,0.12)); border-radius:12px; padding:12px; min-height:120px; background:var(--surface,#fff); }
+  .dash-day-col h5{ margin:0 0 8px; font-size:0.82rem; color:var(--ink-soft,#6b6155); }
+
+  /* --- Staff dashboard: colourful 3D upgrade (added on top — nothing above removed) --- */
+  .dash-stats{ gap:16px; }
+  .dash-stat{
+    position:relative;
+    border-radius:16px;
+    border:2px solid var(--stat-accent, var(--gold,#d7a13a));
+    box-shadow:0 5px 0 0 var(--stat-accent-dark, var(--gold,#d7a13a)), 0 14px 22px -14px rgba(33,21,16,0.35);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .dash-stat:hover{
+    transform:translateY(-4px);
+    box-shadow:0 9px 0 0 var(--stat-accent-dark, var(--gold,#d7a13a)), 0 20px 28px -14px rgba(33,21,16,0.4);
+  }
+  .dash-stat .dash-stat-num{
+    font-family:var(--ff-display,inherit);
+    font-weight:800;
+    color:var(--stat-accent-dark, var(--vermillion-dark,#ab3820));
+    text-shadow:
+      1px 1px 0 rgba(255,255,255,.55),
+      0 2px 0 var(--stat-accent-dark, var(--vermillion-dark,#ab3820)),
+      0 4px 6px rgba(33,21,16,.25);
+  }
+  .dash-stat .dash-stat-label{
+    font-family:var(--ff-hand,inherit);
+    font-size:0.84rem;
+  }
+  .dash-stat:nth-child(1){ --stat-accent:var(--teal,#0f4b4e); --stat-accent-dark:var(--teal-deep,#0a3639); }
+  .dash-stat:nth-child(2){ --stat-accent:var(--marigold,#f4a521); --stat-accent-dark:#c07f10; }
+  .dash-stat:nth-child(3){ --stat-accent:var(--parrot,#3f8f5f); --stat-accent-dark:#2c6b44; }
+  .dash-stat:nth-child(4){ --stat-accent:var(--gold,#d7a13a); --stat-accent-dark:#a5720f; }
+  .dash-stat:nth-child(5){ --stat-accent:var(--teal-deep,#0a3639); --stat-accent-dark:#062224; }
+  .dash-stat:nth-child(6){ --stat-accent:var(--marigold-soft,#ffd98a); --stat-accent-dark:#c07f10; }
+  .dash-stat:nth-child(7){ --stat-accent:var(--vermillion,#d94a2b); --stat-accent-dark:var(--vermillion-dark,#ab3820); }
+  .dash-stat:nth-child(8){ --stat-accent:var(--magenta,#c33d68); --stat-accent-dark:#8f2a4a; }
+
+  .dash-toolbar{
+    background:linear-gradient(180deg, var(--surface,#fff), var(--teal-soft,#e4f1ef));
+    border:2px solid var(--gold,#d7a13a);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 6px 0 0 var(--gold,#d7a13a), 0 22px 30px -18px rgba(10,54,57,0.35);
+    transition:transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease;
+  }
+  .dash-toolbar:hover{
+    transform:translateY(-3px);
+    box-shadow:0 9px 0 0 var(--gold,#d7a13a), 0 28px 36px -18px rgba(10,54,57,0.4);
+  }
+  .dash-toolbar .field label{
+    font-family:var(--ff-display,inherit);
+    font-size:0.82rem;
+    color:var(--teal-deep,#0a3639);
+  }
+  .dash-toolbar input,
+  .dash-toolbar select{
+    background:var(--paper,#fdf8ec);
+    border:2px solid var(--line,rgba(10,54,57,0.12));
+    border-radius:12px;
+    padding:11px 14px;
+    box-shadow:0 3px 0 0 var(--gold,#d7a13a), inset 0 1px 0 rgba(255,255,255,.5);
+    transition:transform .15s ease, border-color .18s ease, box-shadow .15s ease;
+  }
+  .dash-toolbar select{
+    cursor:pointer;appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ab3820' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;background-size:16px;padding-right:38px;
+  }
+  .dash-toolbar input:hover,
+  .dash-toolbar select:hover{
+    transform:translateY(-1px);
+    box-shadow:0 4px 0 0 var(--gold,#d7a13a), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .dash-toolbar input:active,
+  .dash-toolbar select:active{
+    transform:translateY(2px);
+    box-shadow:0 1px 0 0 var(--gold,#d7a13a);
+  }
+  .dash-toolbar input:focus,
+  .dash-toolbar select:focus{
+    border-color:var(--gold,#d7a13a); outline:none;
+    box-shadow:0 3px 0 0 var(--gold,#d7a13a), inset 0 1px 0 rgba(255,255,255,.5), 0 0 0 4px rgba(215,161,58,.32);
+  }
+  .dash-view-toggle button{
+    font-family:var(--ff-display,inherit);
+    font-weight:700;
+    box-shadow:0 4px 0 0 rgba(10,54,57,0.25);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .dash-view-toggle button:hover{ transform:translateY(-2px); }
+  .dash-view-toggle button:active{ transform:translateY(2px); box-shadow:0 1px 0 0 rgba(10,54,57,0.25); }
+  .dash-view-toggle button.is-active{
+    background:var(--vermillion,#d94a2b);
+    border-color:var(--vermillion-dark,#ab3820);
+    box-shadow:0 4px 0 0 var(--vermillion-dark,#ab3820);
+  }
+  .btn-clear-filters{
+    font-family:var(--ff-display,inherit);
+    font-weight:700;
+    font-size:0.92rem;
+    background:var(--vermillion,#d94a2b);
+    color:#fff5e9;
+    border:2px solid var(--vermillion-dark,#ab3820);
+    border-radius:999px;
+    padding:11px 22px;
+    cursor:pointer;
+    box-shadow:0 5px 0 0 var(--vermillion-dark,#ab3820), 0 14px 20px -10px rgba(217,74,43,0.55);
+    transition:transform .18s ease, box-shadow .18s ease;
+    white-space:nowrap;
+  }
+  .btn-clear-filters:hover{
+    transform:translateY(-2px);
+    box-shadow:0 3px 0 0 var(--vermillion-dark,#ab3820), 0 16px 22px -8px rgba(217,74,43,0.6);
+  }
+  .btn-clear-filters:active{
+    transform:translateY(2px);
+    box-shadow:0 1px 0 0 var(--vermillion-dark,#ab3820);
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="garland" aria-hidden="true"><div class="garland-row" id="garland-row"></div></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" data-view="home">
+      <span class="brand-badge"><span class="brand-badge-inner">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f4d774" stroke-width="2">
+          <path d="M4 16.5V9.8a1.6 1.6 0 0 1 .35-1L6 6.5a2 2 0 0 1 1.6-.8h8.8a2 2 0 0 1 1.6.8l1.65 2.3c.23.3.35.66.35 1v6.7" />
+          <path d="M2.5 16.5h19v2.2a1.3 1.3 0 0 1-1.3 1.3H3.8a1.3 1.3 0 0 1-1.3-1.3v-2.2Z" />
+          <circle cx="7" cy="18.3" r="1.4" /><circle cx="17" cy="18.3" r="1.4" /><path d="M4 12h16" />
+        </svg>
+      </span></span>
+      <span><span class="brand-text">AutoSetu</span><span class="brand-text-sub">Aapki Gaadi, Hamari Zimmedari</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-links">Menu ▾</button>
+      <div class="site-nav-links" id="site-nav-links">
+        <a data-view="home">Home</a>
+        <a data-view="services">Services</a>
+        <a data-view="home" data-anchor="how-it-works">How it works</a>
+        <a data-view="home" data-anchor="reviews">Reviews</a>
+        <a data-view="appointments">My appointments</a>
+        <a data-view="staff">Staff portal</a>
+      </div>
+    </nav>
+    <div class="site-nav-actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+      </button>
+      <button class="icon-btn" id="fav-toggle" type="button" aria-label="View favorite services" title="Favorites">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-9.6-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.6 5c-2.1 4.4-9.6 9-9.6 9Z"/></svg>
+        <span class="badge" id="fav-count" style="display:none;">0</span>
+      </button>
+      <a data-view="services" class="btn btn-primary btn-sm">Book a service</a>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+
+<!-- ===================== HOME VIEW ===================== -->
+<section class="page-view is-active" id="view-home">
+
+  <section class="hero">
+    <div class="jaali-veil" aria-hidden="true"></div>
+    <div class="mandala-wrap" aria-hidden="true"><svg viewBox="0 0 200 200"><g id="mandala-outer"></g></svg></div>
+    <div class="mandala-wrap inner" aria-hidden="true" style="top:-40px;right:-60px;width:420px;height:420px;"><svg viewBox="0 0 200 200"><g id="mandala-inner"></g></svg></div>
+    <div class="wheel-deco" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#f4d774" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="50" cy="50" r="38" fill="none" stroke="#f4d774" stroke-width="3"/>
+        <g id="chakra-spokes" stroke="#f4d774" stroke-width="1.6"></g>
+        <circle cx="50" cy="50" r="7" fill="#f4d774"/>
+        <circle cx="50" cy="50" r="7" fill="none" stroke="#0a3639" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-grid">
+        <div>
+          <span class="hero-kicker">✦ बैंगलोर की अपनी वर्कशॉप — Bengaluru's own workshop</span>
+          <h1>Book your car's next service like a train ticket.
+            <span class="devnagari">पूरी ज़िम्मेदारी, पूरे दिल से — no calls, no counter queue.</span>
+          </h1>
+          <p class="hero-sub">Pick the seva, choose your technician, lock a slot — see the price in rupees before you commit. Eleven years of Residency Road trust, now on your phone.</p>
+          <div class="hero-actions">
+            <a data-view="services" class="btn btn-primary">Book a service →</a>
+            <a data-view="home" data-anchor="how-it-works" class="btn btn-ghost">How it works</a>
+          </div>
+          <p class="hero-fineprint">No account needed to book — look up any booking again with your mobile number.</p>
+        </div>
+
+        <div class="ticket-stage">
+          <span class="float-diya" style="top:-38px; left:12%;" aria-hidden="true"><span class="flame"></span><span class="diya-cup"></span></span>
+          <span class="float-diya" style="top:-28px; right:6%; animation-delay:1.4s;" aria-hidden="true"><span class="flame"></span><span class="diya-cup"></span></span>
+          <div class="ticket" id="ticket-card">
+            <div class="ticket-top">
+              <div><span class="ticket-label">Booking chit</span><div class="ticket-id">#AS-48213</div></div>
+              <span class="ticket-status">Confirmed</span>
+            </div>
+            <div class="ticket-perf" aria-hidden="true"></div>
+            <div class="ticket-vehicle" style="margin-top:26px;">Hyundai Creta, 2022</div>
+            <span class="ticket-plate">KA-05-MN-3321</span>
+            <div class="ticket-lines">
+              <div class="ticket-line"><span>Seva</span><span>Oil &amp; filter change</span></div>
+              <div class="ticket-line"><span>Date</span><span>Thu, 4 Sep</span></div>
+              <div class="ticket-line"><span>Time</span><span>10:00 AM</span></div>
+              <div class="ticket-line"><span>Estimate</span><span>From ₹899</span></div>
+            </div>
+            <div class="ticket-tech">
+              <span class="avatar">AM</span>
+              <div><div style="font-weight:700; font-size:0.88rem;">Arjun Mehta</div><div style="font-size:0.78rem; color:var(--ink-soft);">Lead technician</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat"><div class="stat-num" data-count="11" data-suffix="+">0</div><div class="stat-label">Years in business</div></div>
+      <div class="stat"><div class="stat-num" data-count="8400" data-suffix="+">0</div><div class="stat-label">Cars serviced yearly</div></div>
+      <div class="stat"><div class="stat-num" data-count="4.8" data-decimal="1">0</div><div class="stat-label">Average rating</div></div>
+      <div class="stat"><div class="stat-num" data-count="3" data-suffix=" hrs">0</div><div class="stat-label">Average turnaround</div></div>
+    </div>
+
+    <div class="rickshaw-track" aria-hidden="true">
+      <div class="road"></div>
+      <div class="rickshaw">
+        <svg viewBox="0 0 130 60">
+          <ellipse cx="30" cy="52" rx="10" ry="4" fill="rgba(0,0,0,0.25)"/>
+          <ellipse cx="95" cy="52" rx="10" ry="4" fill="rgba(0,0,0,0.25)"/>
+          <path d="M15 50 h100 l-8-14 h-30 l-6-16 h-30 l-4 16 h-18 z" fill="#f4a521" stroke="#7a1f2b" stroke-width="2"/>
+          <path d="M47 20 h30 l4 16 h-38 z" fill="#0f4b4e" stroke="#7a1f2b" stroke-width="2"/>
+          <rect x="18" y="12" width="30" height="18" rx="8" fill="#f4d774" stroke="#7a1f2b" stroke-width="2"/>
+          <circle cx="30" cy="52" r="9" fill="#211510"/><circle cx="30" cy="52" r="3" fill="#d7a13a"/>
+          <circle cx="95" cy="52" r="9" fill="#211510"/><circle cx="95" cy="52" r="3" fill="#d7a13a"/>
+          <circle cx="110" cy="30" r="4" fill="#fff3b0"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee ticker" aria-hidden="true">
+    <div class="marquee-track ticker-track">
+      <span>Transparent pricing, no upselling</span><span>Live status board, no phone tag</span><span>Genuine parts, honest bills</span><span>Certified multi-brand technicians</span>
+      <span>Transparent pricing, no upselling</span><span>Live status board, no phone tag</span><span>Genuine parts, honest bills</span><span>Certified multi-brand technicians</span>
+    </div>
+  </div>
+
+  <section class="section" id="how-it-works">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>How it works<span class="diamond"></span></span>
+        <h2>Five stations, no phone tag.</h2>
+      </div>
+      <div class="rail">
+        <div class="rail-line" aria-hidden="true"></div>
+        <div class="rail-track-icon" aria-hidden="true">
+          <svg viewBox="0 0 40 30"><path d="M4 24 h32 l-3-9 h-9l-2-7h-9l-1 7h-6z" fill="#d94a2b" stroke="#211510" stroke-width="1.5"/><circle cx="12" cy="24" r="3.4" fill="#211510"/><circle cx="28" cy="24" r="3.4" fill="#211510"/></svg>
+        </div>
+        <div class="rail-steps">
+          <div class="rail-step"><span class="rail-dot">1</span><h3>Choose a seva</h3><p>Oil change, brakes, AC, tyres — tell us what the car needs.</p></div>
+          <div class="rail-step"><span class="rail-dot">2</span><h3>Pick a technician</h3><p>See who's free and what they specialise in first.</p></div>
+          <div class="rail-step"><span class="rail-dot">3</span><h3>Choose a slot</h3><p>Real, live availability — not a callback promise.</p></div>
+          <div class="rail-step"><span class="rail-dot">4</span><h3>Get your chit</h3><p>A booking ticket saved to your phone, no app download.</p></div>
+          <div class="rail-step"><span class="rail-dot">5</span><h3>Drive in, drive out</h3><p>Track the job from pending to completed, right to pickup.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Services<span class="diamond"></span></span>
+        <h2>Everything short of a full rebuild.</h2>
+        <p class="section-desc">A quick look at what we cover. Booking, live technician availability and exact slot pricing happen on the services page.</p>
+      </div>
+      <div class="svc-static-grid" id="svc-static-grid"></div>
+      <div class="svc-more">
+        <p>12 service categories, transparent starting prices, and technician-level detail are all on the booking page.</p>
+        <a data-view="services" class="btn btn-primary">View all services &amp; book →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing-glance">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Pricing at a glance<span class="diamond"></span></span>
+        <h2>What people actually pay, on average.</h2>
+        <p class="section-desc">Starting estimates for our most-booked sevas, so you can plan your budget before you even open the booking page.</p>
+      </div>
+      <div class="bar-panel price-panel">
+        <div class="bar-row">
+          <div class="bar-row-top"><span>Oil &amp; filter change</span><span class="price-tag">From ₹899</span></div>
+          <div class="bar-track"><div class="bar-fill" data-pct="15"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-row-top"><span>Wheel alignment &amp; balancing</span><span class="price-tag">From ₹1,199</span></div>
+          <div class="bar-track"><div class="bar-fill" data-pct="20"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-row-top"><span>Brake pad replacement</span><span class="price-tag">From ₹1,899</span></div>
+          <div class="bar-track"><div class="bar-fill" data-pct="32"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-row-top"><span>AC service &amp; gas top-up</span><span class="price-tag">From ₹2,499</span></div>
+          <div class="bar-track"><div class="bar-fill" data-pct="42"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-row-top"><span>Battery replacement</span><span class="price-tag">From ₹3,499</span></div>
+          <div class="bar-track"><div class="bar-fill" data-pct="58"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-row-top"><span>Full periodic service</span><span class="price-tag">From ₹5,999</span></div>
+          <div class="bar-track"><div class="bar-fill" data-pct="100"></div></div>
+        </div>
+        <p class="price-note">Bars are scaled relative to the full periodic service. Exact pricing depends on your vehicle's make, model and condition, and is always confirmed before work begins — see <a data-view="services">the full catalogue</a> for technician-level detail.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="why-us">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Why AutoSetu<span class="diamond"></span></span>
+        <h2>What eleven years on Residency Road taught us.</h2>
+      </div>
+      <div class="usp-layout">
+        <div class="usp-list">
+          <div class="usp-item">
+            <span class="usp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6.5v5C5 16 8 20 12 21c4-1 7-5 7-9.5v-5z"/></svg></span>
+            <div><h3>Genuine parts, always</h3><p>Every part is sourced OEM or OEM-equivalent, with the invoice to prove it.</p></div>
+          </div>
+          <div class="usp-item">
+            <span class="usp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg></span>
+            <div><h3>Price before you commit</h3><p>Estimates are shown in rupees at the time of booking — no counter-side surprises.</p></div>
+          </div>
+          <div class="usp-item">
+            <span class="usp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 4v-1M16 4v-1"/></svg></span>
+            <div><h3>A live job board</h3><p>Every car's status — pending, in-progress, ready — is visible without a phone call.</p></div>
+          </div>
+        </div>
+        <div class="bar-panel">
+          <h3>Where we stand, in numbers</h3>
+          <div class="bar-row"><div class="bar-row-top"><span>Certified technicians</span><span>100%</span></div><div class="bar-track"><div class="bar-fill" data-pct="100"></div></div></div>
+          <div class="bar-row"><div class="bar-row-top"><span>Genuine / OEM-equivalent parts</span><span>100%</span></div><div class="bar-track"><div class="bar-fill" data-pct="100"></div></div></div>
+          <div class="bar-row"><div class="bar-row-top"><span>On-time delivery</span><span>96%</span></div><div class="bar-track"><div class="bar-fill" data-pct="96"></div></div></div>
+          <div class="bar-row"><div class="bar-row-top"><span>Customers who return</span><span>82%</span></div><div class="bar-track"><div class="bar-fill" data-pct="82"></div></div></div>
+          <div class="bar-row"><div class="bar-row-top"><span>Jobs rated 4★ or above</span><span>91%</span></div><div class="bar-track"><div class="bar-fill" data-pct="91"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="care-tips">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Between visits<span class="diamond"></span></span>
+        <h2>Four small habits that save you a big bill.</h2>
+      </div>
+      <div class="tip-grid">
+        <div class="tip-card">
+          <span class="tip-num">1</span>
+          <h3>Check tyre pressure monthly</h3>
+          <p>Under-inflated tyres wear faster and quietly push up your fuel bill.</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-num">2</span>
+          <h3>Don't ignore dashboard lights</h3>
+          <p>A check-engine or battery light is cheaper to fix early than after it fails on the road.</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-num">3</span>
+          <h3>Get the AC checked before monsoon</h3>
+          <p>Fogged-up windows in the rain are usually a gas or filter issue, not a mystery.</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-num">4</span>
+          <h3>Stick to the service interval</h3>
+          <p>Most manufacturers recommend every 10,000 km or 12 months, whichever comes first.</p>
+        </div>
+      </div>
+
+      <div class="cert-strip">
+        <span class="cert-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6.5v5C5 16 8 20 12 21c4-1 7-5 7-9.5v-5z"/></svg>Insurance-approved garage</span>
+        <span class="cert-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg>ISO 9001-aligned workshop process</span>
+        <span class="cert-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Multi-brand certified technicians</span>
+        <span class="cert-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Genuine parts from Bosch, MRF &amp; Mobil</span>
+      </div>
+
+      <div class="locality-strip" aria-label="Areas we serve">
+        <span>Residency Road</span><span>Richmond Town</span><span>Koramangala</span><span>Indiranagar</span><span>HSR Layout</span><span>Jayanagar</span><span>MG Road</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Questions<span class="diamond"></span></span>
+        <h2>Before you book.</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Do I need an account to book a service?</summary>
+          <p>No. You can book a slot without signing up — just save your booking chit, and you can look up or manage any booking later using your mobile number.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is the price I see final, or can it change?</summary>
+          <p>The amount shown at booking is a starting estimate. If the technician finds extra work is needed once your car is inspected, we call or message you with the revised amount before doing anything — nothing is billed without your go-ahead.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I reschedule or cancel after booking?</summary>
+          <p>Yes, any time before your slot from the "My appointments" page — no phone call required, though you're welcome to call if that's easier.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you use genuine parts?</summary>
+          <p>Always. Every part is OEM or OEM-equivalent, and the invoice itemises exactly what was fitted.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you offer pickup and drop?</summary>
+          <p>For most sevas within central Bengaluru, yes — mention it in the notes field while booking, or call the shop to confirm for your area.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt marquee reviews-marquee" id="reviews">
+    <div class="section-head wrap">
+      <span class="section-eyebrow"><span class="diamond"></span>Reviews<span class="diamond"></span></span>
+      <h2>What Bengaluru drivers tell us.</h2>
+    </div>
+    <div class="marquee-track" id="testi-track"></div>
+    <div class="review-form-panel wrap" style="max-width:560px;">
+      <h3>Leave your own review</h3>
+      <form id="review-form" novalidate>
+        <div class="field"><label for="review-name">Your name</label><input id="review-name" type="text" required><span class="field-error-msg"></span></div>
+        <div class="field"><label for="review-vehicle">Vehicle</label><input id="review-vehicle" type="text" placeholder="e.g. Maruti Suzuki Baleno" required><span class="field-error-msg"></span></div>
+        <div class="field"><label>Your rating</label><div class="rate-input" id="review-rate-input"></div></div>
+        <div class="field"><label for="review-quote">Your experience</label><textarea id="review-quote" rows="3" required></textarea><span class="field-error-msg"></span></div>
+        <div style="margin-top:16px;"><button type="submit" class="btn btn-gold btn-sm">Submit review</button></div>
+        <p class="review-thanks" id="review-thanks" role="status">Thanks — your review now appears in the strip above.</p>
+      </form>
+    </div>
+  </section>
+
+  <div class="footer-cta">
+    <div class="footer-cta-inner">
+      <div><h2>Ready when you are.</h2><p>Book online in under two minutes, or give the shop a call.</p></div>
+      <div class="footer-cta-actions">
+        <a data-view="services" class="btn btn-primary">Book a service</a>
+        <a href="tel:+919876543210" class="btn btn-ghost">Call +91 98765 43210</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SERVICES VIEW ===================== -->
+<section class="page-view" id="view-services">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="breadcrumb"><a data-view="home">← Back to Home</a> &nbsp;/&nbsp; Services</p>
+      <span class="page-hero-eyebrow">✦ Full catalogue</span>
+      <h1>Choose a seva, pick a technician, lock a slot.</h1>
+      <p>Prices shown are starting estimates in rupees. Final billing depends on your vehicle's condition and is confirmed before any work begins.</p>
+    </div>
+  </section>
+
+  <section class="section" id="catalogue">
+    <div class="wrap">
+      <div class="recent-strip-wrap" id="recent-strip-wrap">
+        <h4 style="font-size:0.9rem;color:var(--teal-deep);margin-bottom:2px;">Recently viewed</h4>
+        <div class="recent-strip" id="recent-strip"></div>
+      </div>
+      <div class="svc-tabs" id="svc-tabs"></div>
+      <div class="svc-grid" id="svc-grid"></div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="booking">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Booking<span class="diamond"></span></span>
+        <h2>Lock your slot.</h2>
+        <p class="section-desc">Bookings made here are saved to this browser and appear on the My appointments page.</p>
+      </div>
+      <div class="book-panel">
+        <form id="booking-form" novalidate>
+          <div class="field" style="margin-bottom:20px;">
+            <label>Choose a technician <span style="font-weight:400;color:var(--ink-soft);">(tap the ⓘ for a full profile)</span></label>
+            <div class="tech-grid" id="tech-grid"></div>
+            <span class="field-error-msg" id="tech-error-msg">⚠ Please choose a technician.</span>
+          </div>
+          <div class="book-grid">
+            <div class="field" id="field-name"><label for="name-input">Your name</label><input id="name-input" type="text" placeholder="e.g. Aarav Sharma" required><span class="field-error-msg">⚠ Please enter your name.</span></div>
+            <div class="field" id="field-email"><label for="email-input">Email address</label><input id="email-input" type="email" placeholder="e.g. aarav@example.com" required><span class="field-error-msg">⚠ Please enter a valid email address.</span></div>
+            <div class="field" id="field-phone"><label for="phone-input">Phone number</label><input id="phone-input" type="tel" placeholder="e.g. 98765 43210" required><span class="field-error-msg">⚠ Please enter a valid 10-digit Indian mobile number.</span></div>
+            <div class="field" id="field-svc"><label for="svc-select">Service <span style="font-weight:400;color:var(--ink-soft);">(matches the chosen technician)</span></label><select id="svc-select" required></select><span class="field-error-msg">⚠ Please choose a service.</span></div>
+            <div class="field" id="field-veh"><label for="veh-input">Vehicle (make, model &amp; plate)</label><input id="veh-input" type="text" placeholder="e.g. Hyundai Creta, KA-05-MN-3321" required><span class="field-error-msg">⚠ Please enter your vehicle's make, model and plate.</span></div>
+            <div class="field" id="field-date"><label for="date-input">Preferred date</label><input id="date-input" type="date" required><span class="field-error-msg">⚠ Please pick a valid date from today onward.</span></div>
+            <div class="field" id="field-time"><label for="time-input">Preferred time</label><input id="time-input" type="time" required><span class="field-error-msg" id="time-error-msg">⚠ Please pick a time.</span></div>
+          </div>
+
+          <div class="field" style="margin-top:20px;">
+            <label for="notes-input">Notes for the technician <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <textarea id="notes-input" rows="3" placeholder="e.g. Faint knocking sound from the front left wheel when braking."></textarea>
+          </div>
+
+          <div class="schedule-wrap">
+            <h4>This week's availability</h4>
+            <p class="schedule-hint" id="schedule-hint">Green slots are open for your chosen technician. Tap one to fill in the date &amp; time above. Busy/closed slots can't be selected.</p>
+            <div class="schedule-grid" id="schedule-grid"></div>
+          </div>
+
+          <div class="field" style="margin-top:22px;">
+            <label>Reminders</label>
+            <div class="checkbox-row"><input type="checkbox" id="reminder-sms" checked><label for="reminder-sms" style="font-weight:400;">SMS reminder 1 hour before the appointment</label></div>
+            <div class="checkbox-row" style="margin-top:6px;"><input type="checkbox" id="reminder-email" checked><label for="reminder-email" style="font-weight:400;">Email reminder the evening before</label></div>
+          </div>
+
+          <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <button type="submit" class="btn btn-primary" id="booking-submit-btn">Confirm booking</button>
+          </div>
+
+          <div class="form-alert form-alert-loading" id="booking-loading" role="status" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Locking in your slot with the workshop — one moment…</span>
+          </div>
+          <div class="form-alert form-alert-error" id="booking-error" role="alert" aria-live="assertive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            <span id="booking-error-text">We couldn't complete your booking. Please fix the highlighted fields and try again.</span>
+          </div>
+        </form>
+
+        <div class="confirm-panel" id="confirm-panel" role="status" aria-live="polite">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+            Booking chit generated — check your SMS for the ticket.
+          </h4>
+          <div class="confirm-stats" id="confirm-stats"></div>
+          <div class="confirm-actions">
+            <button type="button" class="btn btn-outline btn-sm" id="print-btn">🖨 Print confirmation</button>
+            <button type="button" class="btn btn-outline btn-sm" id="calendar-btn">📅 Add to calendar (.ics)</button>
+            <a data-view="appointments" class="btn btn-outline btn-sm">📋 View my appointments</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-cta">
+    <div class="footer-cta-inner">
+      <div><h2>Not sure what your car needs?</h2><p>Call the shop and we'll help you pick the right seva.</p></div>
+      <div class="footer-cta-actions"><a href="tel:+919876543210" class="btn btn-primary">Call +91 98765 43210</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== APPOINTMENTS VIEW ===================== -->
+<section class="page-view" id="view-appointments">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="breadcrumb"><a data-view="home">← Back to Home</a> &nbsp;/&nbsp; My appointments</p>
+      <span class="page-hero-eyebrow">✦ Your bookings</span>
+      <h1>Track, reschedule or cancel any appointment.</h1>
+      <p>Appointments booked on this device are saved in your browser automatically. A few sample appointments are shown until you make your own.</p>
+    </div>
+  </section>
+
+  <section class="section" id="appt-section">
+    <div class="wrap">
+      <div class="appt-lookup">
+        <div class="field">
+          <label for="appt-search">Search by name, vehicle or chit number</label>
+          <input id="appt-search" type="text" placeholder="e.g. Aarav or AS-48213">
+        </div>
+        <div class="field" style="flex:none;min-width:140px;">
+          <label for="appt-filter">Status</label>
+          <select id="appt-filter">
+            <option value="All">All</option>
+            <option value="Booked">Booked</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Rescheduled">Rescheduled</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="No Show">No Show</option>
+          </select>
+        </div>
+      </div>
+      <div class="appt-list" id="appt-list"></div>
+    </div>
+  </section>
+
+  <div class="footer-cta">
+    <div class="footer-cta-inner">
+      <div><h2>Need a new appointment?</h2><p>Book another seva in under two minutes.</p></div>
+      <div class="footer-cta-actions"><a data-view="services" class="btn btn-primary">Book a service</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STAFF VIEW ===================== -->
+<section class="page-view" id="view-staff">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="breadcrumb"><a data-view="home">← Back to Home</a> &nbsp;/&nbsp; Staff portal</p>
+      <span class="page-hero-eyebrow">✦ For the shop floor</span>
+      <h1>Sign in to run today's board.</h1>
+      <p>Staff accounts see live job status, technician schedules, and walk-in intake. Customers don't need an account to book — this portal is for AutoSetu team members only.</p>
+    </div>
+  </section>
+
+  <section class="section" id="auth">
+    <div class="wrap">
+      <div class="staff-tabs">
+        <button class="staff-tab is-active" data-target="login-form" type="button">Sign in</button>
+        <button class="staff-tab" data-target="signup-form" type="button">Create account</button>
+      </div>
+      <div class="auth-panel">
+        <form class="auth-form is-active" id="login-form" novalidate>
+          <div class="field" id="field-login-id"><label for="login-id">Staff ID or email</label><input id="login-id" type="text" required><span class="field-error-msg">⚠ Please enter your staff ID or email.</span></div>
+          <div class="field" id="field-login-pass"><label for="login-pass">Password</label><input id="login-pass" type="password" required><span class="field-error-msg">⚠ Please enter your password.</span></div>
+          <button type="submit" class="btn btn-primary" style="justify-content:center;">Sign in</button>
+          <p class="auth-note">Forgot your password? Ask your shop manager to reset it from the admin console.</p>
+        </form>
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="field" id="field-signup-name"><label for="signup-name">Full name</label><input id="signup-name" type="text" required><span class="field-error-msg">⚠ Please enter your full name.</span></div>
+          <div class="field" id="field-signup-role"><label for="signup-role">Role</label>
+            <select id="signup-role" required>
+              <option value="">Select a role</option>
+              <option>Technician</option><option>Service advisor</option><option>Front desk</option><option>Shop manager</option>
+            </select>
+            <span class="field-error-msg">⚠ Please select a role.</span>
+          </div>
+          <div class="field" id="field-signup-email"><label for="signup-email">Work email</label><input id="signup-email" type="email" required><span class="field-error-msg">⚠ Please enter a valid work email.</span></div>
+          <div class="field" id="field-signup-pass"><label for="signup-pass">Create password</label><input id="signup-pass" type="password" required minlength="8"><span class="field-error-msg">⚠ Password must be at least 8 characters.</span></div>
+          <button type="submit" class="btn btn-primary" style="justify-content:center;">Request account</button>
+          <p class="auth-note">New accounts are approved by the shop manager before first sign-in.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Staff dashboard: shown after sign-in (toggle the "dash-hidden" class from script.js
+       once a staff session exists). Satisfies brief §11 Staff Dashboard + §12 Search/Filtering. -->
+  <section class="section section-alt dash-hidden" id="staff-dashboard">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>Today's board<span class="diamond"></span></span>
+        <h2>Today's schedule, at a glance.</h2>
+        <p class="section-desc">Live counts update as jobs move through the workflow. Search or filter below to find a specific appointment.</p>
+      </div>
+
+      <div class="dash-stats" id="dash-stats">
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-total">0</div><div class="dash-stat-label">Total appointments</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-booked">0</div><div class="dash-stat-label">Booked</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-confirmed">0</div><div class="dash-stat-label">Confirmed</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-progress">0</div><div class="dash-stat-label">In progress</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-completed">0</div><div class="dash-stat-label">Completed</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-rescheduled">0</div><div class="dash-stat-label">Rescheduled</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-cancelled">0</div><div class="dash-stat-label">Cancelled</div></div>
+        <div class="dash-stat"><div class="dash-stat-num" id="dash-stat-noshow">0</div><div class="dash-stat-label">No show</div></div>
+      </div>
+
+      <div class="dash-toolbar">
+        <div class="field">
+          <label for="dash-search">Search by customer name</label>
+          <input id="dash-search" type="text" placeholder="e.g. Aarav Sharma">
+        </div>
+        <div class="field">
+          <label for="dash-filter-date">Date</label>
+          <input id="dash-filter-date" type="date">
+        </div>
+        <div class="field">
+          <label for="dash-filter-provider">Technician</label>
+          <select id="dash-filter-provider"><option value="All">All technicians</option></select>
+        </div>
+        <div class="field">
+          <label for="dash-filter-service">Service</label>
+          <select id="dash-filter-service"><option value="All">All services</option></select>
+        </div>
+        <div class="field">
+          <label for="dash-filter-status">Status</label>
+          <select id="dash-filter-status">
+            <option value="All">All</option>
+            <option value="Booked">Booked</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="No Show">No Show</option>
+          </select>
+        </div>
+        <div class="field" style="flex:none;">
+          <label>&nbsp;</label>
+          <button type="button" class="btn-clear-filters" id="dash-clear-filters-btn">Clear Filters</button>
+        </div>
+        <div class="dash-view-toggle" role="group" aria-label="Switch schedule view">
+          <button type="button" class="is-active" id="dash-view-list-btn" aria-pressed="true">☰ List</button>
+          <button type="button" id="dash-view-calendar-btn" aria-pressed="false">🗓 Calendar</button>
+        </div>
+      </div>
+
+      <div class="appt-list" id="dash-appt-list"></div>
+
+      <div class="dash-calendar dash-hidden" id="dash-calendar" aria-label="This week's schedule by day"></div>
+    </div>
+  </section>
+
+  <section class="section" id="team">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-eyebrow"><span class="diamond"></span>The team<span class="diamond"></span></span>
+        <h2>Who's on the floor. Tap anyone for their full profile.</h2>
+      </div>
+      <div class="team-grid" id="team-grid"></div>
+    </div>
+  </section>
+</section>
+
+</main>
+
+<footer>
+  <div class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="brand" data-view="home" style="cursor:pointer;">
+          <span class="brand-badge" style="animation:none;"><span class="brand-badge-inner" style="animation:none;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f4d774" stroke-width="2">
+              <path d="M4 16.5V9.8a1.6 1.6 0 0 1 .35-1L6 6.5a2 2 0 0 1 1.6-.8h8.8a2 2 0 0 1 1.6.8l1.65 2.3c.23.3.35.66.35 1v6.7" />
+              <path d="M2.5 16.5h19v2.2a1.3 1.3 0 0 1-1.3 1.3H3.8a1.3 1.3 0 0 1-1.3-1.3v-2.2Z" />
+              <circle cx="7" cy="18.3" r="1.4" /><circle cx="17" cy="18.3" r="1.4" /><path d="M4 12h16" />
+            </svg>
+          </span></span>
+          <span><span class="brand-text" style="color:#fdf3dd;">AutoSetu</span><span class="brand-text-sub">Aapki Gaadi, Hamari Zimmedari</span></span>
+        </div>
+        <p class="footer-tagline">Independent multi-brand service centre, serving Bengaluru since 2013.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="AutoSetu on Instagram"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/919876543210" aria-label="AutoSetu on WhatsApp"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l1.4-4.1A8 8 0 1 1 9.5 19L4 20Z"/><path d="M8.5 9.5c0 3.5 2.5 6 6 6"/></svg></a>
+          <a href="tel:+919876543210" aria-label="Call AutoSetu"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col"><h3>Hours</h3><ul class="footer-hours"><li><span>Mon–Sat</span><span>9AM–6PM</span></li><li><span>Sunday</span><span>10AM–2PM</span></li></ul></div>
+      <div class="footer-col"><h3>Visit</h3><ul class="footer-plain" style="display:grid;gap:6px;"><li>24, Residency Road</li><li>Bengaluru, Karnataka 560025</li><li><a href="tel:+919876543210">+91 98765 43210</a></li></ul></div>
+      <div class="footer-col"><h3>Shortcuts</h3><ul>
+        <li><a data-view="services">Book a service</a></li>
+        <li><a data-view="appointments">My appointments</a></li>
+        <li><a data-view="staff">Staff portal</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© <span id="footer-year"></span> AutoSetu. GSTIN 29ABCDE1234F1Z5.</p>
+      <p style="font-family:var(--ff-hand);">Built for the shop floor, not the boardroom.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- favorites drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="fav-drawer" aria-label="Favorite services">
+  <button class="drawer-close" id="drawer-close" aria-label="Close favorites">✕</button>
+  <h3>Your favorite sevas</h3>
+  <div id="drawer-body"></div>
+</aside>
+
+<!-- generic modal (provider profile / compare table / staff appointment detail) -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- confirm dialog for destructive actions -->
+<div class="confirm-dialog-overlay" id="confirm-dialog-overlay" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-desc">
+  <div class="confirm-dialog">
+    <h4 id="confirm-dialog-title">Remove this?</h4>
+    <p id="confirm-dialog-desc">This action can't be undone.</p>
+    <div class="confirm-dialog-actions">
+      <button type="button" class="btn btn-ghost btn-sm" id="confirm-dialog-cancel">Cancel</button>
+      <button type="button" class="btn btn-primary btn-sm" id="confirm-dialog-ok">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- floating compare bar -->
+<div class="compare-bar" id="compare-bar">
+  <span id="compare-count">0 selected</span>
+  <button type="button" class="btn btn-gold btn-sm" id="compare-open-btn">Compare</button>
+  <button type="button" class="btn btn-ghost btn-sm" id="compare-clear-btn" style="border-color:#fdf3dd;color:#fdf3dd;">Clear</button>
+</div>
+
+<!-- toast region for lightweight success / error feedback -->
+<div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+<!-- printable confirmation, only visible via print stylesheet -->
+<div id="print-chit"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
